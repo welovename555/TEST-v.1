@@ -10,33 +10,36 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#0b1020;
-      --surface:#11162a;
-      --surface-2:#0d1326;
-      --text:#e6eaf2;
+      --bg:#070c1a;
+      --surface:#0e1428;
+      --surface-2:#0b1224;
+      --elev:#131a31;
+      --text:#e9edf7;
       --muted:#9aa4b2;
-      --primary:#5b8cff;
-      --primary-2:#7ca4ff;
+      --primary:#4f80ff;
+      --primary-2:#79a0ff;
       --accent:#22d1ee;
-      --success:#26d07c;
-      --danger:#ff647c;
+      --success:#25cf7c;
+      --danger:#ff6b81;
       --warning:#ffcc66;
       --card-radius:16px;
       --shadow:0 10px 30px rgba(0,0,0,.35);
+      --nav-h:64px;
     }
     [data-theme="light"]{
-      --bg:#f7f8fb;
+      --bg:#f7f8fc;
       --surface:#ffffff;
-      --surface-2:#f0f3fa;
-      --text:#0e1320;
-      --muted:#5b6472;
+      --surface-2:#f2f5fc;
+      --elev:#ffffff;
+      --text:#0f1527;
+      --muted:#5a6472;
       --primary:#3b6cff;
-      --primary-2:#5e83ff;
-      --accent:#0fbad6;
-      --success:#15b86a;
-      --danger:#e84f67;
-      --warning:#e5b23b;
-      --shadow:0 10px 25px rgba(16,28,77,.08);
+      --primary-2:#5f86ff;
+      --accent:#12bfe0;
+      --success:#19b36f;
+      --danger:#e75b73;
+      --warning:#f0c65a;
+      --shadow:0 10px 28px rgba(16,28,77,.08);
     }
 
     *{box-sizing:border-box}
@@ -46,98 +49,78 @@
       font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;
       background:linear-gradient(180deg, var(--bg), var(--surface-2));
       color:var(--text);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
 
-    /* Layout */
-    .app{
-      min-height:100dvh;
-      display:flex;
-      flex-direction:column;
-    }
+    /* App Layout */
+    .app{min-height:100dvh;display:flex;flex-direction:column;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom));}
     header.appbar{
-      position:sticky;top:0;z-index:10;
-      backdrop-filter:saturate(1.4) blur(8px);
-      background:linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,0))
-                 ,var(--surface-2);
+      position:sticky;top:0;z-index:20;
+      background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,0)), var(--surface-2);
+      backdrop-filter:saturate(1.5) blur(10px);
       border-bottom:1px solid rgba(255,255,255,.06);
     }
-    .appbar .wrap{
-      max-width:1200px;margin:0 auto;padding:14px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
-    }
-    .title{
-      display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:.2px;
-    }
-    .title .logo{
-      width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--accent));
-      box-shadow:0 6px 18px rgba(34,209,238,.25);display:grid;place-items:center;color:white;font-weight:800;
-    }
-
+    .appbar .wrap{max-width:1100px;margin:0 auto;padding:14px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .title{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px}
+    .title .logo{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--accent));box-shadow:0 6px 18px rgba(34,209,238,.25)}
     .grow{flex:1}
 
-    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-    .btn{appearance:none;border:none;border-radius:12px;padding:10px 12px;background:var(--surface);
-      color:var(--text);box-shadow:var(--shadow);cursor:pointer;font-weight:600;transition:.25s ease;
-    }
-    .btn:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(0,0,0,.2)}
-    .btn:active{transform:translateY(0)}
-    .btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff}
-    .btn.ghost{background:transparent;border:1px solid rgba(127, 139, 172, .35)}
+    .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .chips{display:flex;gap:8px;overflow:auto;padding-bottom:2px}
+    .chip{border:1px solid rgba(127,139,172,.35);color:var(--text);background:transparent;padding:8px 10px;border-radius:999px;cursor:pointer;font-weight:600;white-space:nowrap}
+    .chip.active{background:linear-gradient(135deg,var(--primary),var(--primary-2));border-color:transparent;color:#fff}
 
     .date-range{display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:12px;background:var(--surface);box-shadow:var(--shadow)}
     .date-range input{background:transparent;border:none;color:var(--text);padding:8px;border-radius:8px;outline:none;font-weight:600}
     .date-range label{font-size:12px;color:var(--muted)}
 
-    .theme-toggle{display:flex;align-items:center;gap:8px}
-    .switch{position:relative;width:50px;height:28px;background:var(--surface);border-radius:999px;cursor:pointer;border:1px solid rgba(127,139,172,.35)}
-    .switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));transition:.25s}
-    .switch.active::after{left:25px}
+    .btn{appearance:none;border:none;border-radius:12px;padding:10px 12px;background:var(--surface);color:var(--text);box-shadow:var(--shadow);cursor:pointer;font-weight:700}
+    .btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff}
 
-    main{max-width:1200px;margin:16px auto;padding:0 16px 28px;display:grid;gap:14px}
+    main{max-width:1100px;margin:10px auto 0;padding:0 14px 16px}
 
-    /* Summary cards */
-    .grid{display:grid;gap:14px}
-    .cards{grid-template-columns:repeat(2,1fr)}
-    @media(min-width:720px){.cards{grid-template-columns:repeat(4,1fr)}}
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)), var(--surface);
-      border:1px solid rgba(127,139,172,.2);
-      border-radius:var(--card-radius);
-      box-shadow:var(--shadow);
-      padding:16px;position:relative;overflow:hidden
+    /* Sections / Tabs */
+    .tab-section{display:none}
+    .tab-section.active{display:block}
+    @media(min-width:960px){
+      .tab-section{display:block}
     }
+
+    /* Summary cards: horizontal scroll on mobile */
+    .cards{display:grid;gap:12px;grid-auto-flow:column;grid-auto-columns:80%;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px}
+    .cards .card{scroll-snap-align:start}
+    @media(min-width:600px){.cards{grid-auto-columns:48%}}
+    @media(min-width:960px){.cards{grid-auto-flow:dense;grid-template-columns:repeat(4,1fr);overflow:visible}}
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)), var(--surface);border:1px solid rgba(127,139,172,.2);border-radius:var(--card-radius);box-shadow:var(--shadow);padding:16px;position:relative;overflow:hidden}
     .card .label{color:var(--muted);font-size:12px}
-    .card .value{font-weight:800;font-size:22px;margin-top:6px}
+    .card .value{font-weight:900;font-size:24px;margin-top:6px}
     .trend{display:flex;align-items:center;gap:6px;font-size:12px;margin-top:8px}
     .trend.up{color:var(--success)}
     .trend.down{color:var(--danger)}
 
-    /* Panels */
-    .panel{display:grid;gap:12px}
+    .panel{display:grid;gap:10px;margin-top:14px}
     .panel header{display:flex;align-items:center;justify-content:space-between;gap:10px}
     .panel header h3{margin:0;font-size:16px}
-    .panel .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .panel .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
-    .chart-card{height:320px}
+    .chart-card{height:56vh;border-radius:var(--card-radius);}
     .chart{width:100%;height:100%}
+    @media(min-width:960px){.chart-card{height:360px}}
 
-    /* Top products list */
     .top-list{display:grid;gap:10px}
-    .top-item{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:12px;background:var(--surface-2);border:1px solid rgba(127,139,172,.2)}
+    .top-item{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:12px;background:var(--elev);border:1px solid rgba(127,139,172,.2)}
     .pill{font-size:12px;padding:4px 8px;border-radius:999px;background:rgba(91,140,255,.15);color:var(--primary)}
 
-    /* Heatmap legend */
     .legend{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
     .legend .box{width:16px;height:10px;border-radius:3px;background:var(--surface-2);border:1px solid rgba(127,139,172,.2)}
 
-    /* Loading shimmer */
-    .shimmer{position:relative;overflow:hidden}
-    .shimmer::after{content:"";position:absolute;inset:0;transform:translateX(-100%);
-      background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,.12) 50%, transparent 100%);
-      animation:shimmer 1.4s infinite;
-    }
-    @keyframes shimmer{100%{transform:translateX(100%)}}
+    /* Bottom Navigation (mobile) */
+    .bottom-nav{position:fixed;left:0;right:0;bottom:0;height:var(--nav-h);background:var(--surface);border-top:1px solid rgba(127,139,172,.24);display:grid;grid-template-columns:repeat(3,1fr);z-index:30;padding-bottom:env(safe-area-inset-bottom)}
+    .nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);font-weight:700;gap:4px;cursor:pointer}
+    .nav-btn.active{color:var(--primary)}
+    .nav-ico{width:20px;height:20px;border-radius:6px;background:currentColor;opacity:.85}
+    @media(min-width:960px){.bottom-nav{display:none}}
 
     /* Animations */
     .fade-up{opacity:0;transform:translateY(8px);animation:fadeUp .5s ease forwards}
@@ -153,7 +136,7 @@
       <div class="wrap">
         <div class="title">
           <div class="logo">SA</div>
-          <div>Sales Analytics Dashboard</div>
+          <div>Sales Analytics</div>
         </div>
         <div class="grow"></div>
         <div class="controls">
@@ -163,95 +146,108 @@
             <label for="end">ถึง</label>
             <input type="date" id="end" />
           </div>
-          <button class="btn ghost" data-range="7">7 วัน</button>
-          <button class="btn ghost" data-range="30">30 วัน</button>
+          <div class="chips" role="tablist" aria-label="ช่วงเวลา">
+            <button class="chip" data-range="7">7 วัน</button>
+            <button class="chip" data-range="14">14 วัน</button>
+            <button class="chip" data-range="30">30 วัน</button>
+          </div>
           <button class="btn primary" id="apply">อัปเดต</button>
           <div class="theme-toggle">
-            <div style="font-size:12px;color:var(--muted)">ธีม</div>
-            <div class="switch" id="themeSwitch" role="switch" aria-label="สลับธีม"></div>
+            <div style="font-size:12px;color:var(--muted);margin-right:6px">ธีม</div>
+            <div class="chip" id="themeSwitch">สลับ</div>
           </div>
         </div>
       </div>
     </header>
 
     <main>
-      <section class="grid cards">
-        <div class="card fade-up" style="animation-delay:.05s">
-          <div class="label">ยอดขายรวม (ชิ้น)</div>
-          <div class="value" id="metric-total-units">—</div>
-          <div class="trend" id="metric-total-units-trend"></div>
+      <!-- OVERVIEW TAB -->
+      <section class="tab-section" id="tab-overview">
+        <div class="cards">
+          <div class="card fade-up" style="animation-delay:.05s">
+            <div class="label">ยอดขายรวม (ชิ้น)</div>
+            <div class="value" id="metric-total-units">—</div>
+            <div class="trend" id="metric-total-units-trend"></div>
+          </div>
+          <div class="card fade-up" style="animation-delay:.1s">
+            <div class="label">จำนวนออเดอร์</div>
+            <div class="value" id="metric-orders">—</div>
+            <div class="trend" id="metric-orders-trend"></div>
+          </div>
+          <div class="card fade-up" style="animation-delay:.15s">
+            <div class="label">จำนวนลูกค้า</div>
+            <div class="value" id="metric-customers">—</div>
+            <div class="trend" id="metric-customers-trend"></div>
+          </div>
+          <div class="card fade-up" style="animation-delay:.2s">
+            <div class="label">ชั่วโมงที่พีคที่สุด</div>
+            <div class="value" id="metric-peak-time">—</div>
+            <div class="trend" id="metric-peak-day"></div>
+          </div>
         </div>
-        <div class="card fade-up" style="animation-delay:.1s">
-          <div class="label">จำนวนออเดอร์</div>
-          <div class="value" id="metric-orders">—</div>
-          <div class="trend" id="metric-orders-trend"></div>
-        </div>
-        <div class="card fade-up" style="animation-delay:.15s">
-          <div class="label">จำนวนลูกค้า</div>
-          <div class="value" id="metric-customers">—</div>
-          <div class="trend" id="metric-customers-trend"></div>
-        </div>
-        <div class="card fade-up" style="animation-delay:.2s">
-          <div class="label">ชั่วโมงที่พีคที่สุด</div>
-          <div class="value" id="metric-peak-time">—</div>
-          <div class="trend" id="metric-peak-day"></div>
+
+        <div class="panel">
+          <div class="card chart-card">
+            <header>
+              <h3>สินค้าขายดี (Top-selling)</h3>
+              <div class="actions">
+                <select id="topN" class="btn" aria-label="จำนวนอันดับ">
+                  <option value="5">Top 5</option>
+                  <option value="10">Top 10</option>
+                  <option value="15">Top 15</option>
+                </select>
+              </div>
+            </header>
+            <div class="chart" id="chart-top"></div>
+          </div>
+          <div class="card">
+            <div class="top-list" id="top-list"></div>
+          </div>
         </div>
       </section>
 
-      <section class="grid" style="grid-template-columns:1fr;gap:14px">
-        <!-- Top selling products -->
-        <div class="card panel chart-card fade-up" style="animation-delay:.25s">
-          <header>
-            <h3>สินค้าขายดี (Top-selling)</h3>
-            <div class="actions">
-              <select id="topN" class="btn ghost" aria-label="จำนวนอันดับ">
-                <option value="5">Top 5</option>
-                <option value="10">Top 10</option>
-                <option value="15">Top 15</option>
-              </select>
-            </div>
-          </header>
-          <div class="chart" id="chart-top"></div>
-          <div class="top-list" id="top-list" style="margin-top:10px"></div>
-        </div>
+      <!-- SALES TAB -->
+      <section class="tab-section" id="tab-sales">
+        <div class="panel">
+          <div class="card chart-card">
+            <header>
+              <h3>ยอดขายรายวันแยกตามสินค้า</h3>
+              <div class="actions">
+                <label class="btn" style="display:flex;gap:6px;align-items:center;background:var(--surface)">
+                  <span>สินค้า</span>
+                  <select id="productSelect" style="background:transparent;color:var(--text);border:none;outline:none">
+                    <option value="__TOP5__">Top 5</option>
+                    <option value="__ALL__">ทั้งหมด (สรุป)</option>
+                  </select>
+                </label>
+              </div>
+            </header>
+            <div class="chart" id="chart-daily"></div>
+          </div>
 
-        <!-- Daily sales per product -->
-        <div class="card panel chart-card fade-up" style="animation-delay:.3s">
-          <header>
-            <h3>ยอดขายรายวันแยกตามสินค้า (ชิ้นต่อวัน)</h3>
-            <div class="actions">
-              <label class="btn ghost" style="display:flex;gap:6px;align-items:center">
-                <span>สินค้า</span>
-                <select id="productSelect" style="background:transparent;color:var(--text);border:none;outline:none">
-                  <option value="__TOP5__">Top 5</option>
-                  <option value="__ALL__">ทั้งหมด (สรุป)</option>
-                </select>
-              </label>
-            </div>
-          </header>
-          <div class="chart" id="chart-daily"></div>
+          <div class="card chart-card" style="height:48vh">
+            <header>
+              <h3>ช่วงเวลาพีค/ต่ำสุด (รายวัน/รายสัปดาห์)</h3>
+              <div class="actions legend">
+                <span class="box" style="background:#20304a"></span> ต่ำ
+                <span class="box" style="background:#5b8cff"></span> กลาง
+                <span class="box" style="background:#22d1ee"></span> สูง
+              </div>
+            </header>
+            <div class="chart" id="chart-heatmap"></div>
+          </div>
         </div>
+      </section>
 
-        <!-- Peak time heatmap -->
-        <div class="card panel chart-card fade-up" style="animation-delay:.35s">
-          <header>
-            <h3>ช่วงเวลาพีค/ต่ำสุด (รายวัน/รายสัปดาห์)</h3>
-            <div class="actions legend">
-              <span class="box" style="background:#20304a"></span> ต่ำ
-              <span class="box" style="background:#5b8cff"></span> กลาง
-              <span class="box" style="background:#22d1ee"></span> สูง
-            </div>
-          </header>
-          <div class="chart" id="chart-heatmap"></div>
-        </div>
-
-        <!-- Customer trend -->
-        <div class="card panel chart-card fade-up" style="animation-delay:.4s">
-          <header>
-            <h3>แนวโน้มจำนวนลูกค้า</h3>
-            <div class="actions"></div>
-          </header>
-          <div class="chart" id="chart-customers"></div>
+      <!-- CUSTOMERS TAB -->
+      <section class="tab-section" id="tab-customers">
+        <div class="panel">
+          <div class="card chart-card">
+            <header>
+              <h3>แนวโน้มจำนวนลูกค้า</h3>
+            </header>
+            <div class="chart" id="chart-customers"></div>
+          </div>
         </div>
       </section>
     </main>
@@ -259,6 +255,13 @@
     <footer>
       Sales Analytics Dashboard • Mobile-First • Interactive Charts • UI/UX ทันสมัย
     </footer>
+
+    <!-- Bottom Navigation (mobile) -->
+    <nav class="bottom-nav" aria-label="เมนูหลัก">
+      <button class="nav-btn active" data-tab="overview"><span class="nav-ico"></span><span>ภาพรวม</span></button>
+      <button class="nav-btn" data-tab="sales"><span class="nav-ico"></span><span>ยอดขาย</span></button>
+      <button class="nav-btn" data-tab="customers"><span class="nav-ico"></span><span>ลูกค้า</span></button>
+    </nav>
   </div>
 
   <!-- ECharts CDN -->
@@ -273,42 +276,34 @@
     dayjs.extend(dayjs_plugin_timezone);
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Bangkok';
 
-    // ===== Config: Supabase (set useMock=true to simulate data) =====
+    // ===== Config: Supabase (toggle useMock for local simulation) =====
     const SUPABASE_URL = 'https://jkenfjjxwdckmvqjkdkp.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZW5mamp4d2Rja212cWprZGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MjA5NjIsImV4cCI6MjA2NjM5Njk2Mn0.3VOZpt4baNnC5-qpYq6dC9UZ0gcfI2V4aTdi1itxmXI';
     const sb = window.supabase ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-    const useMock = false; // ใช้ฐานข้อ��ูลจริงผ่าน Supabase
+    const useMock = false; // ใช้ฐานข้อมูลจริง
 
     // ===== Utilities =====
     const $ = (sel) => document.querySelector(sel);
     const fmt = (n) => new Intl.NumberFormat('th-TH').format(n);
+    const isMobile = () => window.matchMedia('(max-width: 959px)').matches;
 
-    // Theme handling
+    // Theme
     const theme = {
       get current(){ return document.documentElement.getAttribute('data-theme') || 'dark' },
-      toggle(){ const t = this.current === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', t); $('#themeSwitch').classList.toggle('active', t==='light'); charts.renderAll(); }
+      toggle(){ const t = this.current === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', t); charts.resizeAll(); }
     };
 
-    // ===== Mock Data Generator =====
+    // ===== Mock Data (optional) =====
     const mock = {
-      products:[
-        {id:'P01', name:'กาแฟคาปูชิโน่'},
-        {id:'P02', name:'ลาเต้'},
-        {id:'P03', name:'อเมริกาโน่'},
-        {id:'P04', name:'ชาเขียวมัทฉะ'},
-        {id:'P05', name:'โกโก้เข้มข้น'},
-        {id:'P06', name:'ชานมไข่มุก'},
-        {id:'P07', name:'น้ำส้มคั้นสด'},
-        {id:'P08', name:'สมูทตี้ผลไม้รวม'},
-      ],
+      products:[{id:'P01', name:'กาแฟคาปูชิโน่'},{id:'P02', name:'ลาเต้'},{id:'P03', name:'อเมริกาโน่'},{id:'P04', name:'ชาเขียวมัทฉะ'},{id:'P05', name:'โกโก้เข้มข้น'},{id:'P06', name:'ชานมไข่มุก'},{id:'P07', name:'น้ำส้มคั้นสด'},{id:'P08', name:'สมูทตี้ผลไม้รวม'},],
       price:{P01:70,P02:75,P03:65,P04:85,P05:80,P06:60,P07:55,P08:90},
-      randomCustomer(i){ return 'C' + (1000 + Math.floor(Math.random()*3000)); },
+      randomCustomer(){ return 'C' + (1000 + Math.floor(Math.random()*3000)); },
       generate(start, end){
         const records = [];
         const startD = dayjs(start).startOf('day');
         const endD = dayjs(end).endOf('day');
         for(let d = startD; d.isBefore(endD); d = d.add(1,'day')){
-          const base = 40 + Math.floor(Math.random()*40); // orders/day
+          const base = 40 + Math.floor(Math.random()*40);
           for(let i=0;i<base;i++){
             const hourBias = [7,8,9,10,11,12,13,14,15,16,17,18];
             const h = hourBias[Math.floor(Math.random()*hourBias.length)];
@@ -316,33 +311,19 @@
             const ts = d.hour(h).minute(m).second(Math.floor(Math.random()*60));
             const p = this.products[Math.floor(Math.random()*this.products.length)];
             const qty = 1 + (Math.random()<.2 ? 1 : 0) + (Math.random()<.07 ? 1 : 0);
-            records.push({
-              id:'S'+Math.random().toString(36).slice(2),
-              timestamp: ts.toDate().toISOString(),
-              productId: p.id,
-              productName: p.name,
-              quantity: qty,
-              amount: qty * (this.price[p.id]||60),
-              customerId: this.randomCustomer()
-            });
+            records.push({ id:'S'+Math.random().toString(36).slice(2), timestamp: ts.toDate().toISOString(), productId: p.id, productName: p.name, quantity: qty, amount: qty * (this.price[p.id]||60), customerId: this.randomCustomer() });
           }
         }
         return { sales: records };
       }
     };
 
-    // ===== Data Access Layer =====
+    // ===== Data Layer =====
     async function fetchSalesData(startISO, endISO){
-      if(useMock){
-        // Simulate latency
-        await new Promise(r=>setTimeout(r, 300));
-        return mock.generate(startISO, endISO);
-      }
+      if(useMock){ await new Promise(r=>setTimeout(r,200)); return mock.generate(startISO, endISO); }
       if(!sb) throw new Error('Supabase client not initialized');
       const start = dayjs(startISO).startOf('day').toISOString();
       const end = dayjs(endISO).endOf('day').toISOString();
-
-      // 1) Load sales within range
       const { data: salesRows, error: salesErr } = await sb
         .from('sales')
         .select('created_at, product_id, quantity, price_per_unit, total_item_price, transaction_id')
@@ -351,283 +332,223 @@
         .order('created_at', { ascending: true })
         .limit(10000);
       if(salesErr) throw salesErr;
-
-      // 2) Load product names for involved product_ids
       const productIds = [...new Set((salesRows||[]).map(r=>r.product_id).filter(Boolean))];
       let namesMap = new Map();
       if(productIds.length){
-        const { data: prods, error: prodErr } = await sb
-          .from('products')
-          .select('id, name')
-          .in('id', productIds);
+        const { data: prods, error: prodErr } = await sb.from('products').select('id, name').in('id', productIds);
         if(prodErr) throw prodErr;
         namesMap = new Map((prods||[]).map(p=>[p.id, p.name]));
       }
-
-      const sales = (salesRows||[]).map(r => ({
-        timestamp: r.created_at,
-        productId: r.product_id,
-        productName: namesMap.get(r.product_id) || r.product_id,
-        quantity: r.quantity,
-        amount: Number(r.total_item_price ?? (Number(r.price_per_unit) * r.quantity)),
-        customerId: r.transaction_id // proxy: ใช้รหัสธุรกรรมแทนลูกค้า
+      const sales = (salesRows||[]).map(r=>({
+        timestamp:r.created_at,
+        productId:r.product_id,
+        productName:namesMap.get(r.product_id)||r.product_id,
+        quantity:r.quantity,
+        amount:Number(r.total_item_price ?? (Number(r.price_per_unit)*r.quantity)),
+        customerId:r.transaction_id
       }));
       return { sales };
     }
 
-    // ===== Aggregation Helpers =====
-    function rangeDays(start, end){
-      const days = []; let d = dayjs(start).startOf('day'); const e = dayjs(end).startOf('day');
-      while(d.isSame(e) || d.isBefore(e)){ days.push(d); d = d.add(1,'day'); }
-      return days;
-    }
-
+    // ===== Aggregation =====
+    function rangeDays(start, end){ const days = []; let d = dayjs(start).startOf('day'); const e = dayjs(end).startOf('day'); while(d.isSame(e) || d.isBefore(e)){ days.push(d); d = d.add(1,'day'); } return days; }
     function aggregate(data, start, end){
       const sales = data.sales || [];
       const byProductTotals = new Map();
-      const byDateProduct = new Map(); // key: date|productId -> qty
+      const byDateProduct = new Map(); // date|product -> qty
       const customersByDay = new Map(); // date -> Set(customerId)
-      const heatmap = Array.from({length:7}, ()=> Array(24).fill(0)); // dow(0-6) x hour(0-23)
-      let orders = 0, totalUnits = 0;
-
+      const heatmap = Array.from({length:7}, ()=> Array(24).fill(0));
+      let orders=0, totalUnits=0;
       for(const s of sales){
-        const d = dayjs(s.timestamp).tz(tz);
-        const dateKey = d.format('YYYY-MM-DD');
+        const d = dayjs(s.timestamp).tz(tz); const dateKey = d.format('YYYY-MM-DD');
         orders += 1; totalUnits += s.quantity;
         byProductTotals.set(s.productId, (byProductTotals.get(s.productId)||0) + s.quantity);
-        const dpk = dateKey + '|' + s.productId;
-        byDateProduct.set(dpk, (byDateProduct.get(dpk)||0) + s.quantity);
-        if(!customersByDay.has(dateKey)) customersByDay.set(dateKey, new Set());
-        customersByDay.get(dateKey).add(s.customerId);
+        const k = dateKey+'|'+s.productId; byDateProduct.set(k, (byDateProduct.get(k)||0)+s.quantity);
+        if(!customersByDay.has(dateKey)) customersByDay.set(dateKey, new Set()); customersByDay.get(dateKey).add(s.customerId);
         heatmap[d.day()][d.hour()] += s.quantity;
       }
-
       const days = rangeDays(start, end);
       const customersSeries = days.map(d=>customersByDay.get(d.format('YYYY-MM-DD'))?.size||0);
-
       const topProducts = [...byProductTotals.entries()].sort((a,b)=>b[1]-a[1]);
-
       const dailySeriesByProduct = new Map();
-      for(const [pid] of topProducts){
-        dailySeriesByProduct.set(pid, days.map(d=>byDateProduct.get(d.format('YYYY-MM-DD')+'|'+pid)||0));
-      }
-
-      // Peak analysis
-      let peak = { value:-Infinity, day:0, hour:0 };
-      let low = { value:Infinity, day:0, hour:0 };
-      for(let dow=0; dow<7; dow++){
-        for(let h=0; h<24; h++){
-          const v = heatmap[dow][h];
-          if(v>peak.value) peak = {value:v, day:dow, hour:h};
-          if(v<low.value) low = {value:v, day:dow, hour:h};
-        }
-      }
-
-      return {
-        orders, totalUnits, days, topProducts, dailySeriesByProduct, customersSeries, heatmap, peak, low
-      };
+      for(const [pid] of topProducts){ dailySeriesByProduct.set(pid, days.map(d=>byDateProduct.get(d.format('YYYY-MM-DD')+'|'+pid)||0)); }
+      // Peak/Low
+      let peak={value:-Infinity,day:0,hour:0}, low={value:Infinity,day:0,hour:0};
+      for(let dow=0;dow<7;dow++){ for(let h=0;h<24;h++){ const v=heatmap[dow][h]; if(v>peak.value) peak={value:v,day:dow,hour:h}; if(v<low.value) low={value:v,day:dow,hour:h}; } }
+      return { orders,totalUnits,days,topProducts,dailySeriesByProduct,customersSeries,heatmap,peak,low };
     }
 
     // ===== Charts =====
     const charts = (function(){
       let topChart, dailyChart, heatChart, custChart;
+      function color(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+      function tColor(){ return getComputedStyle(document.documentElement).getPropertyValue('--text').trim()||'#e9edf7'; }
+      function mColor(){ return getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()||'#9aa4b2'; }
 
-      function baseTextColor(){ return getComputedStyle(document.documentElement).getPropertyValue('--text').trim() || '#e6eaf2'; }
-      function baseMutedColor(){ return getComputedStyle(document.documentElement).getPropertyValue('--muted').trim() || '#9aa4b2'; }
-      function color(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+      function baseTextStyle(){ return { color:tColor(), fontSize:isMobile()?12:13 } }
+      function baseAxisLabel(){ return { color:mColor(), fontSize:isMobile()?11:12, rotate: isMobile()? 25 : 0 } }
 
-      function renderTopSelling(container, data, topN){
-        const labels = [], values = [];
-        const items = data.topProducts.slice(0, topN);
-        for(const [pid, qty] of items){
-          const name = (window.__latest?.productNames?.get(pid)) || pid;
-          labels.push(name); values.push(qty);
-        }
-        const opt = {
-          grid:{left:10,right:10,top:20,bottom:0,containLabel:true},
-          xAxis:{ type:'value', axisLabel:{color:baseMutedColor()} },
-          yAxis:{ type:'category', data:labels, axisLabel:{color:baseTextColor()} },
-          series:[{ type:'bar', data:values, barWidth:14,
-            itemStyle:{
-              borderRadius:[0,8,8,0],
-              color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:color('--primary')},{offset:1,color:color('--accent')}])
-            },
-            label:{show:true, position:'right', color:baseTextColor()}
+      function renderTop(container, data, topN){
+        const labels=[],values=[]; const items=data.topProducts.slice(0, topN);
+        for(const [pid, qty] of items){ const name=(window.__latest?.productNames?.get(pid)) || pid; labels.push(name); values.push(qty); }
+        const opt={
+          grid:{left:10,right:10,top:10,bottom:10,containLabel:true},
+          textStyle: baseTextStyle(),
+          xAxis:{type:'value', axisLabel:baseAxisLabel()},
+          yAxis:{type:'category', data:labels, axisLabel:{color:tColor(), fontSize:isMobile()?12:13}},
+          series:[{type:'bar', data:values, barWidth:isMobile()?18:14,
+            itemStyle:{ borderRadius:[0,8,8,0], color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:color('--primary')},{offset:1,color:color('--accent')}]) },
+            label:{show:false}
           }],
-          tooltip:{trigger:'item'}
+          tooltip:{trigger:'item', textStyle:{fontSize:isMobile()?12:13}}
         };
         topChart = topChart || echarts.init(container);
-        topChart.setOption(opt, true);
-        window.addEventListener('resize', ()=> topChart && topChart.resize());
+        topChart.setOption(opt,true);
       }
 
       function renderTopList(container, data, topN){
-        container.innerHTML = '';
-        const items = data.topProducts.slice(0, topN);
+        container.innerHTML=''; const items=data.topProducts.slice(0, topN);
         for(const [pid, qty] of items){
-          const name = (window.__latest?.productNames?.get(pid)) || pid;
-          const el = document.createElement('div');
-          el.className = 'top-item';
-          el.innerHTML = `<div style="display:flex;gap:10px;align-items:center">`+
-                         `<div class="pill">${name}</div>`+
-                         `</div>`+
-                         `<div style="font-weight:700">${fmt(qty)} ชิ้น</div>`;
+          const name=(window.__latest?.productNames?.get(pid)) || pid;
+          const el=document.createElement('div'); el.className='top-item';
+          el.innerHTML=`<div style="display:flex;gap:10px;align-items:center">`+
+                       `<div class="pill">${name}</div>`+
+                       `</div>`+
+                       `<div style="font-weight:800">${fmt(qty)} ชิ้น</div>`;
           container.appendChild(el);
         }
       }
 
       function renderDaily(container, data, selection){
-        // selection: '__TOP5__' | '__ALL__' | productId
         const x = data.days.map(d=>d.format('DD MMM'));
         let series=[];
         if(selection==='__ALL__'){
-          // single series of total per day
-          const totalPerDay = data.days.map((d,i)=>{
-            let sum = 0; for(const arr of data.dailySeriesByProduct.values()) sum += arr[i]; return sum;
-          });
-          series=[{ name:'รวม', type:'line', smooth:true, areaStyle:{}, symbol:'circle', data:totalPerDay,
-            itemStyle:{color:color('--primary')}, lineStyle:{width:3} }];
-        } else {
+          const totalPerDay = data.days.map((d,i)=>{ let sum=0; for(const arr of data.dailySeriesByProduct.values()) sum+=arr[i]; return sum; });
+          series=[{ name:'รวม', type:'line', smooth:true, data:totalPerDay, symbol:'circle', areaStyle:{opacity:.12}, itemStyle:{color:color('--primary')}, lineStyle:{width:3} }];
+        }else{
           const productIds = selection==='__TOP5__' ? data.topProducts.slice(0,5).map(([pid])=>pid) : [selection];
           const palette=[color('--primary'),color('--accent'),'#7ee787','#ef6fff','#ffaa33'];
-          series = productIds.map((pid,idx)=>{
-            const arr = data.dailySeriesByProduct.get(pid) || data.days.map(_=>0);
-            const name = (window.__latest?.productNames?.get(pid)) || pid;
-            return { name, type:'line', smooth:true, symbol:'circle', areaStyle:{opacity:.12}, data:arr,
-              itemStyle:{color:palette[idx%palette.length]}, lineStyle:{width:3} };
-          });
+          series = productIds.map((pid,idx)=>({
+            name:(window.__latest?.productNames?.get(pid)) || pid,
+            type:'line', smooth:true, symbol:'circle', areaStyle:{opacity:.12}, data:data.dailySeriesByProduct.get(pid)||data.days.map(_=>0),
+            itemStyle:{color:palette[idx%palette.length]}, lineStyle:{width:3}
+          }));
         }
-        const opt = {
-          legend:{textStyle:{color:baseTextColor()}},
-          grid:{left:10,right:10,top:30,bottom:10,containLabel:true},
-          tooltip:{trigger:'axis'},
-          xAxis:{type:'category', data:x, axisLabel:{color:baseMutedColor()}},
-          yAxis:{type:'value', axisLabel:{color:baseMutedColor()}},
+        const opt={
+          textStyle: baseTextStyle(),
+          legend:{type:'scroll', textStyle:{color:tColor(), fontSize:isMobile()?11:12}},
+          grid:{left:10,right:isMobile()?10:18,top:24,bottom:isMobile()? 30 : 18,containLabel:true},
+          tooltip:{trigger:'axis', textStyle:{fontSize:isMobile()?12:13}},
+          xAxis:{type:'category', data:x, axisLabel:baseAxisLabel()},
+          yAxis:{type:'value', axisLabel:{color:mColor(), fontSize:isMobile()?11:12}},
+          dataZoom: isMobile()? [{type:'inside', throttle:50}] : [{type:'inside'},{type:'slider'}],
           series
         };
         dailyChart = dailyChart || echarts.init(container);
-        dailyChart.setOption(opt, true);
-        window.addEventListener('resize', ()=> dailyChart && dailyChart.resize());
+        dailyChart.setOption(opt,true);
       }
 
-      function renderHeatmap(container, data){
-        // data.heatmap: [7][24]
-        const hours = Array.from({length:24}, (_,i)=> i.toString().padStart(2,'0')+':00');
+      function renderHeat(container, data){
+        const hours = Array.from({length:24},(_,i)=> i.toString().padStart(2,'0')+':00');
         const days = ['อา','จ','อ','พ','พฤ','ศ','ส'];
-        const values = [];
-        let max=0; let min=Infinity;
-        for(let d=0; d<7; d++){
-          for(let h=0; h<24; h++){
-            const v = data.heatmap[d][h];
-            values.push([h, d, v]);
-            if(v>max) max=v; if(v<min) min=v;
-          }
-        }
-        const opt = {
-          tooltip:{position:'top'},
-          grid:{left:50,right:20,top:20,bottom:20},
-          xAxis:{type:'category', data:hours, splitArea:{show:true}, axisLabel:{color:baseMutedColor(), interval:2}},
-          yAxis:{type:'category', data:days, splitArea:{show:true}, axisLabel:{color:baseMutedColor()}},
-          visualMap:{min:min, max:max||1, calculable:true, orient:'horizontal', left:'center', bottom:0,
-            inRange:{color:['#20304a','#5b8cff','#22d1ee']}, textStyle:{color:baseTextColor()} },
-          series:[{
-            name:'ปริมาณชิ้น', type:'heatmap', data:values,
-            label:{show:false},
-            emphasis:{itemStyle:{shadowBlur:10,shadowColor:'rgba(0,0,0,0.3)'}}
-          }]
+        const values=[]; let max=0, min=Infinity;
+        for(let d=0; d<7; d++) for(let h=0; h<24; h++){ const v=data.heatmap[d][h]; values.push([h,d,v]); if(v>max)max=v; if(v<min)min=v; }
+        const opt={
+          textStyle: baseTextStyle(),
+          tooltip:{position:'top', textStyle:{fontSize:isMobile()?12:13}, formatter:(p)=>`${days[p.value[1]]} ${hours[p.value[0]]}<br/>${p.value[2]} ชิ้น`},
+          grid:{left:isMobile()?40:50,right:18,top:18,bottom:28},
+          xAxis:{type:'category', data:hours, splitArea:{show:true}, axisLabel:{color:mColor(), fontSize:isMobile()?10:11, interval:2, rotate:isMobile()?45:0}},
+          yAxis:{type:'category', data:days, splitArea:{show:true}, axisLabel:{color:mColor(), fontSize:isMobile()?11:12}},
+          visualMap:{min:min, max:max||1, calculable:true, orient:'horizontal', left:'center', bottom:0, inRange:{color:['#20304a','#5b8cff','#22d1ee']}, textStyle:{color:tColor(), fontSize:isMobile()?11:12}},
+          series:[{name:'ปริมาณชิ้น', type:'heatmap', data:values, label:{show:false}, emphasis:{itemStyle:{shadowBlur:8,shadowColor:'rgba(0,0,0,0.3)'}}}]
         };
         heatChart = heatChart || echarts.init(container);
-        heatChart.setOption(opt, true);
-        window.addEventListener('resize', ()=> heatChart && heatChart.resize());
+        heatChart.setOption(opt,true);
       }
 
       function renderCustomers(container, data){
         const x = data.days.map(d=>d.format('DD MMM'));
-        const opt = {
-          grid:{left:10,right:10,top:20,bottom:10,containLabel:true},
-          tooltip:{trigger:'axis'},
-          xAxis:{type:'category', data:x, axisLabel:{color:baseMutedColor()}},
-          yAxis:{type:'value', axisLabel:{color:baseMutedColor()}},
-          series:[{ name:'ลูกค้า/วัน', type:'line', smooth:true, data:data.customersSeries,
-            symbol:'circle', areaStyle:{opacity:.12}, itemStyle:{color:color('--success')}, lineStyle:{width:3} }]
+        const opt={
+          textStyle: baseTextStyle(),
+          grid:{left:10,right:isMobile()?10:18,top:18,bottom:isMobile()?28:18,containLabel:true},
+          tooltip:{trigger:'axis', textStyle:{fontSize:isMobile()?12:13}},
+          xAxis:{type:'category', data:x, axisLabel:baseAxisLabel()},
+          yAxis:{type:'value', axisLabel:{color:mColor(), fontSize:isMobile()?11:12}},
+          series:[{ name:'ลูกค้า/วัน', type:'line', smooth:true, data:window.__latest?.agg?.customersSeries||[], symbol:'circle', areaStyle:{opacity:.12}, itemStyle:{color:color('--success')}, lineStyle:{width:3} }]
         };
         custChart = custChart || echarts.init(container);
-        custChart.setOption(opt, true);
-        window.addEventListener('resize', ()=> custChart && custChart.resize());
+        custChart.setOption(opt,true);
       }
 
       function renderAll(){
-        if(window.__latest){
-          const { agg } = window.__latest;
-          renderTopSelling($('#chart-top'), agg, parseInt($('#topN').value,10));
-          renderTopList($('#top-list'), agg, parseInt($('#topN').value,10));
-          renderDaily($('#chart-daily'), agg, $('#productSelect').value);
-          renderHeatmap($('#chart-heatmap'), agg);
-          renderCustomers($('#chart-customers'), agg);
-        }
+        if(!window.__latest) return;
+        const { agg } = window.__latest;
+        renderTop($('#chart-top'), agg, parseInt($('#topN').value,10));
+        renderTopList($('#top-list'), agg, parseInt($('#topN').value,10));
+        renderDaily($('#chart-daily'), agg, $('#productSelect').value);
+        renderHeat($('#chart-heatmap'), agg);
+        renderCustomers($('#chart-customers'), agg);
       }
 
-      return { renderTopSelling, renderDaily, renderHeatmap, renderCustomers, renderTopList, renderAll };
+      function resizeAll(){
+        [topChart,dailyChart,heatChart,custChart].forEach(c=>{ if(c){ try{ c.resize(); }catch(e){} } });
+      }
+
+      return { renderAll, resizeAll };
     })();
 
-    // ===== App Logic =====
+    // ===== Tabs & Controls =====
+    function setActiveTab(tab){
+      const isDesk = !isMobile();
+      document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.getAttribute('data-tab')===tab));
+      if(isDesk){ // desktop: show all
+        document.querySelectorAll('.tab-section').forEach(s=>s.classList.add('active'));
+      } else {
+        document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));
+        const el = document.getElementById('tab-'+tab); if(el) el.classList.add('active');
+      }
+      charts.resizeAll();
+    }
+
     async function loadAndRender(){
       const start = $('#start').value || dayjs().subtract(29,'day').format('YYYY-MM-DD');
       const end = $('#end').value || dayjs().format('YYYY-MM-DD');
-      // Save back defaulted values for UX
       $('#start').value = start; $('#end').value = end;
 
-      // Show loading shimmer
-      for(const id of ['#chart-top','#chart-daily','#chart-heatmap','#chart-customers']){
-        const el = $(id); el.classList.add('shimmer');
-      }
+      // shimmer
+      ['#chart-top','#chart-daily','#chart-heatmap','#chart-customers'].forEach(id=>{ const el=$(id); if(el){ el.classList.add('fade-up'); } });
 
       const raw = await fetchSalesData(start, end);
       const agg = aggregate(raw, start, end);
 
-      // Update metrics
+      // metrics
       $('#metric-total-units').textContent = fmt(agg.totalUnits);
       $('#metric-orders').textContent = fmt(agg.orders);
-      const customerTotal = agg.customersSeries.reduce((a,b)=>a+b,0);
       $('#metric-customers').textContent = fmt(new Set(raw.sales.map(s=>s.customerId)).size);
-
-      // Peak labels
-      const dayNames = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
+      const dayNames=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
       $('#metric-peak-time').textContent = `${agg.peak.hour.toString().padStart(2,'0')}:00`;
       $('#metric-peak-day').textContent = `พีคสุด: ${dayNames[agg.peak.day]} / ต่ำสุด: ${dayNames[agg.low.day]}`;
 
-      // Trends (mocked vs previous period)
+      // trend vs previous period
       const prevRaw = await fetchSalesData(dayjs(start).subtract( (dayjs(end).diff(dayjs(start),'day')+1) ,'day').format('YYYY-MM-DD'), dayjs(start).subtract(1,'day').format('YYYY-MM-DD'));
       const prevAgg = aggregate(prevRaw, dayjs(start).subtract( (dayjs(end).diff(dayjs(start),'day')+1) ,'day'), dayjs(start).subtract(1,'day'));
-      function renderTrend(el, curr, prev){
-        const diff = curr - prev; const pct = prev ? (diff/prev)*100 : 100;
-        el.className = 'trend ' + (diff>=0 ? 'up' : 'down');
-        el.innerHTML = `${diff>=0?'▲':'▼'} ${isFinite(pct)?pct.toFixed(1):'—'}% เทียบช่วงก่อนหน้า`;
-      }
+      function renderTrend(el, curr, prev){ const diff=curr-prev; const pct=prev?(diff/prev)*100:100; el.className='trend '+(diff>=0?'up':'down'); el.innerHTML=`${diff>=0?'▲':'▼'} ${isFinite(pct)?pct.toFixed(1):'—'}% เทียบช่วงก่อนหน้า`; }
       renderTrend($('#metric-total-units-trend'), agg.totalUnits, prevAgg.totalUnits);
       renderTrend($('#metric-orders-trend'), agg.orders, prevAgg.orders);
       renderTrend($('#metric-customers-trend'), new Set(raw.sales.map(s=>s.customerId)).size, new Set(prevRaw.sales.map(s=>s.customerId)).size);
 
-      // Render charts
-      const productNames = new Map();
-      raw.sales.forEach(s => { if (s.productId && s.productName) productNames.set(s.productId, s.productName); });
+      // charts
+      const productNames = new Map(); raw.sales.forEach(s=>{ if(s.productId && s.productName) productNames.set(s.productId, s.productName); });
       window.__latest = { raw, agg, productNames };
-      charts.renderTopSelling($('#chart-top'), agg, parseInt($('#topN').value,10));
-      charts.renderTopList($('#top-list'), agg, parseInt($('#topN').value,10));
-      charts.renderDaily($('#chart-daily'), agg, $('#productSelect').value);
-      charts.renderHeatmap($('#chart-heatmap'), agg);
-      charts.renderCustomers($('#chart-customers'), agg);
-
-      // Remove shimmer
-      for(const id of ['#chart-top','#chart-daily','#chart-heatmap','#chart-customers']){
-        const el = $(id); el.classList.remove('shimmer');
-      }
+      charts.renderAll();
     }
 
     function initControls(){
-      // Range quick buttons
+      // quick range chips
       document.querySelectorAll('[data-range]').forEach(btn=>{
         btn.addEventListener('click', ()=>{
+          document.querySelectorAll('[data-range]').forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
           const days = parseInt(btn.getAttribute('data-range'),10);
           const end = dayjs().format('YYYY-MM-DD');
           const start = dayjs().subtract(days-1,'day').format('YYYY-MM-DD');
@@ -639,18 +560,21 @@
       $('#topN').addEventListener('change', ()=> charts.renderAll());
       $('#productSelect').addEventListener('change', ()=> charts.renderAll());
 
-      // Default theme: dark
-      document.documentElement.setAttribute('data-theme','dark');
-      $('#themeSwitch').classList.remove('active');
+      // tabs
+      document.querySelectorAll('.nav-btn').forEach(btn=> btn.addEventListener('click', ()=> setActiveTab(btn.getAttribute('data-tab'))));
+      const applyLayout = ()=> setActiveTab('overview');
+      window.addEventListener('resize', ()=> applyLayout());
+      applyLayout();
     }
 
     // ===== Boot =====
     window.addEventListener('DOMContentLoaded', async ()=>{
-      initControls();
-      // Default last 30 days
+      // defaults
       $('#start').value = dayjs().subtract(29,'day').format('YYYY-MM-DD');
       $('#end').value = dayjs().format('YYYY-MM-DD');
+      initControls();
       await loadAndRender();
+      charts.resizeAll();
     });
   </script>
 </body>
