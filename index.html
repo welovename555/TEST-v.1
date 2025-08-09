@@ -184,6 +184,18 @@
             <div class="value" id="metric-peak-time">—</div>
             <div class="trend" id="metric-peak-day"></div>
           </div>
+          <div class="card fade-up" style="animation-delay:.25s">
+            <div class="label">เงินสด</div>
+            <div class="value" id="metric-cash">—</div>
+          </div>
+          <div class="card fade-up" style="animation-delay:.3s">
+            <div class="label">เงินโอน</div>
+            <div class="value" id="metric-transfer">—</div>
+          </div>
+          <div class="card fade-up" style="animation-delay:.35s">
+            <div class="label">เงินรวม</div>
+            <div class="value" id="metric-revenue">—</div>
+          </div>
         </div>
 
         <div class="panel">
@@ -227,14 +239,10 @@
 
           <div class="card chart-card" style="height:48vh">
             <header>
-              <h3>ช่วงเวลาพีค/ต่ำสุด (รายวัน/รายสัปดาห์)</h3>
-              <div class="actions legend">
-                <span class="box" style="background:#20304a"></span> ต่ำ
-                <span class="box" style="background:#5b8cff"></span> กลาง
-                <span class="box" style="background:#22d1ee"></span> สูง
-              </div>
+              <h3>ชั่วโมงขายพีค (เรียงจากมากไปน้อย)</h3>
+              <div class="actions"></div>
             </header>
-            <div class="chart" id="chart-heatmap"></div>
+            <div class="chart" id="chart-peak"></div>
           </div>
         </div>
       </section>
@@ -285,7 +293,14 @@
     // ===== Utilities =====
     const $ = (sel) => document.querySelector(sel);
     const fmt = (n) => new Intl.NumberFormat('th-TH').format(n);
+    const fmtTHB = (n) => new Intl.NumberFormat('th-TH',{style:'currency',currency:'THB',maximumFractionDigits:0}).format(Number(n)||0);
     const isMobile = () => window.matchMedia('(max-width: 959px)').matches;
+    function normalizePayMethod(v){
+      const s = (v||'').toString().trim().toLowerCase();
+      if(['cash','เงินสด'].some(k=>s.includes(k))) return 'cash';
+      if(['transfer','โอน','bank','qr','promptpay','พร้อมเพย์'].some(k=>s.includes(k))) return 'transfer';
+      return 'other';
+    }
 
     // Theme
     const theme = {
@@ -326,7 +341,7 @@
       const end = dayjs(endISO).endOf('day').toISOString();
       const { data: salesRows, error: salesErr } = await sb
         .from('sales')
-        .select('created_at, product_id, quantity, price_per_unit, total_item_price, transaction_id')
+        .select('created_at, product_id, quantity, price_per_unit, total_item_price, transaction_id, payment_method')
         .gte('created_at', start)
         .lte('created_at', end)
         .order('created_at', { ascending: true })
@@ -345,7 +360,8 @@
         productName:namesMap.get(r.product_id)||r.product_id,
         quantity:r.quantity,
         amount:Number(r.total_item_price ?? (Number(r.price_per_unit)*r.quantity)),
-        customerId:r.transaction_id
+        customerId:r.transaction_id,
+        paymentMethod: normalizePayMethod(r.payment_method)
       }));
       return { sales };
     }
@@ -358,10 +374,10 @@
       const byDateProduct = new Map(); // date|product -> qty
       const customersByDay = new Map(); // date -> Set(customerId)
       const heatmap = Array.from({length:7}, ()=> Array(24).fill(0));
-      let orders=0, totalUnits=0;
+      let orders=0, totalUnits=0, cashTotal=0, transferTotal=0, revenueTotal=0;
       for(const s of sales){
         const d = dayjs(s.timestamp).tz(tz); const dateKey = d.format('YYYY-MM-DD');
-        orders += 1; totalUnits += s.quantity;
+        orders += 1; totalUnits += s.quantity; revenueTotal += Number(s.amount)||0; if((s.paymentMethod||'').toLowerCase()==='cash'){ cashTotal += Number(s.amount)||0; } else if((s.paymentMethod||'').toLowerCase()==='transfer'){ transferTotal += Number(s.amount)||0; }
         byProductTotals.set(s.productId, (byProductTotals.get(s.productId)||0) + s.quantity);
         const k = dateKey+'|'+s.productId; byDateProduct.set(k, (byDateProduct.get(k)||0)+s.quantity);
         if(!customersByDay.has(dateKey)) customersByDay.set(dateKey, new Set()); customersByDay.get(dateKey).add(s.customerId);
@@ -375,7 +391,7 @@
       // Peak/Low
       let peak={value:-Infinity,day:0,hour:0}, low={value:Infinity,day:0,hour:0};
       for(let dow=0;dow<7;dow++){ for(let h=0;h<24;h++){ const v=heatmap[dow][h]; if(v>peak.value) peak={value:v,day:dow,hour:h}; if(v<low.value) low={value:v,day:dow,hour:h}; } }
-      return { orders,totalUnits,days,topProducts,dailySeriesByProduct,customersSeries,heatmap,peak,low };
+      return { orders,totalUnits,days,topProducts,dailySeriesByProduct,customersSeries,heatmap,peak,low,cashTotal,transferTotal,revenueTotal };
     }
 
     // ===== Charts =====
@@ -392,13 +408,14 @@
         const labels=[],values=[]; const items=data.topProducts.slice(0, topN);
         for(const [pid, qty] of items){ const name=(window.__latest?.productNames?.get(pid)) || pid; labels.push(name); values.push(qty); }
         const opt={
-          grid:{left:10,right:10,top:10,bottom:10,containLabel:true},
+          grid:{left:12,right:12,top:10,bottom:10,containLabel:true},
           textStyle: baseTextStyle(),
-          xAxis:{type:'value', axisLabel:baseAxisLabel()},
+          xAxis:{type:'value', axisLabel:{color:mColor(), fontSize:isMobile()?11:12}},
           yAxis:{type:'category', data:labels, axisLabel:{color:tColor(), fontSize:isMobile()?12:13}},
+          dataZoom: isMobile()? [{type:'inside', yAxisIndex:0, throttle:50}] : [{type:'inside', yAxisIndex:0},{type:'slider', yAxisIndex:0}],
           series:[{type:'bar', data:values, barWidth:isMobile()?18:14,
             itemStyle:{ borderRadius:[0,8,8,0], color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:color('--primary')},{offset:1,color:color('--accent')}]) },
-            label:{show:false}
+            label:{show:true, position:'right', color:tColor(), fontSize:isMobile()?11:12, formatter:(p)=>fmt(p.value)}
           }],
           tooltip:{trigger:'item', textStyle:{fontSize:isMobile()?12:13}}
         };
@@ -448,19 +465,23 @@
         dailyChart.setOption(opt,true);
       }
 
-      function renderHeat(container, data){
-        const hours = Array.from({length:24},(_,i)=> i.toString().padStart(2,'0')+':00');
-        const days = ['อา','จ','อ','พ','พฤ','ศ','ส'];
-        const values=[]; let max=0, min=Infinity;
-        for(let d=0; d<7; d++) for(let h=0; h<24; h++){ const v=data.heatmap[d][h]; values.push([h,d,v]); if(v>max)max=v; if(v<min)min=v; }
-        const opt={
+      function renderPeak(container, data){
+        const totals = Array.from({length:24}, (_,h)=>({hour:h, total:0}));
+        for(let d=0; d<7; d++){ for(let h=0; h<24; h++){ totals[h].total += data.heatmap[d][h]; } }
+        totals.sort((a,b)=> b.total - a.total);
+        const labels = totals.map(t=> t.hour.toString().padStart(2,'0')+':00');
+        const values = totals.map(t=> t.total);
+        const opt = {
+          grid:{left:12,right:12,top:10,bottom:10,containLabel:true},
           textStyle: baseTextStyle(),
-          tooltip:{position:'top', textStyle:{fontSize:isMobile()?12:13}, formatter:(p)=>`${days[p.value[1]]} ${hours[p.value[0]]}<br/>${p.value[2]} ชิ้น`},
-          grid:{left:isMobile()?40:50,right:18,top:18,bottom:28},
-          xAxis:{type:'category', data:hours, splitArea:{show:true}, axisLabel:{color:mColor(), fontSize:isMobile()?10:11, interval:2, rotate:isMobile()?45:0}},
-          yAxis:{type:'category', data:days, splitArea:{show:true}, axisLabel:{color:mColor(), fontSize:isMobile()?11:12}},
-          visualMap:{min:min, max:max||1, calculable:true, orient:'horizontal', left:'center', bottom:0, inRange:{color:['#20304a','#5b8cff','#22d1ee']}, textStyle:{color:tColor(), fontSize:isMobile()?11:12}},
-          series:[{name:'ปริมาณชิ้น', type:'heatmap', data:values, label:{show:false}, emphasis:{itemStyle:{shadowBlur:8,shadowColor:'rgba(0,0,0,0.3)'}}}]
+          xAxis:{type:'value', axisLabel:{color:mColor(), fontSize:isMobile()?11:12}},
+          yAxis:{type:'category', data:labels, axisLabel:{color:tColor(), fontSize:isMobile()?12:13}},
+          dataZoom: isMobile()? [{type:'inside', yAxisIndex:0, throttle:50}] : [{type:'inside', yAxisIndex:0},{type:'slider', yAxisIndex:0}],
+          series:[{ type:'bar', data:values, barWidth:isMobile()?18:14,
+            itemStyle:{ borderRadius:[0,8,8,0], color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:color('--primary')},{offset:1,color:color('--accent')}]) },
+            label:{show:true, position:'right', color:tColor(), fontSize:isMobile()?11:12, formatter:(p)=>fmt(p.value)}
+          }],
+          tooltip:{trigger:'item', textStyle:{fontSize:isMobile()?12:13}}
         };
         heatChart = heatChart || echarts.init(container);
         heatChart.setOption(opt,true);
@@ -486,7 +507,7 @@
         renderTop($('#chart-top'), agg, parseInt($('#topN').value,10));
         renderTopList($('#top-list'), agg, parseInt($('#topN').value,10));
         renderDaily($('#chart-daily'), agg, $('#productSelect').value);
-        renderHeat($('#chart-heatmap'), agg);
+        renderPeak($('#chart-peak'), agg);
         renderCustomers($('#chart-customers'), agg);
       }
 
@@ -516,7 +537,7 @@
       $('#start').value = start; $('#end').value = end;
 
       // shimmer
-      ['#chart-top','#chart-daily','#chart-heatmap','#chart-customers'].forEach(id=>{ const el=$(id); if(el){ el.classList.add('fade-up'); } });
+      ['#chart-top','#chart-daily','#chart-peak','#chart-customers'].forEach(id=>{ const el=$(id); if(el){ el.classList.add('fade-up'); } });
 
       const raw = await fetchSalesData(start, end);
       const agg = aggregate(raw, start, end);
@@ -525,6 +546,9 @@
       $('#metric-total-units').textContent = fmt(agg.totalUnits);
       $('#metric-orders').textContent = fmt(agg.orders);
       $('#metric-customers').textContent = fmt(new Set(raw.sales.map(s=>s.customerId)).size);
+      $('#metric-cash').textContent = fmtTHB(agg.cashTotal);
+      $('#metric-transfer').textContent = fmtTHB(agg.transferTotal);
+      $('#metric-revenue').textContent = fmtTHB(agg.revenueTotal);
       const dayNames=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
       $('#metric-peak-time').textContent = `${agg.peak.hour.toString().padStart(2,'0')}:00`;
       $('#metric-peak-day').textContent = `พีคสุด: ${dayNames[agg.peak.day]} / ต่ำสุด: ${dayNames[agg.low.day]}`;
